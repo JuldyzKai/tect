@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ТЕСТ</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, rgba(170, 176, 198, 0.8), rgba(231, 207, 207, 0.393), rgba(246, 223, 173, 0.8)),
+                        url('Жібек пен Т.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .game-area {
+            background-color: rgba(14, 10, 95, 0.921);
+            border-radius: 15px;
+            padding: 25px;
+            flex-grow: 1;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .level {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .level.active {
+            display: block;
+        }
+        
+        .question {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .option {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .option:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        
+        .score {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+        }
+        
+        .media-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .result-screen {
+            text-align: center;
+            display: none;
+        }
+        
+        .result-title {
+            font-size: 2rem;
+            color: #ffcc00;
+            margin-bottom: 20px;
+        }
+        
+        .final-score {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+        
+        .share-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        
+        .share-btn:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+        
+        .restart-btn {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        
+        .restart-btn:hover {
+            background-color: #e67e22;
+            transform: scale(1.05);
+        }
+        
+        .progress-bar {
+            height: 5px;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .question-counter {
+            position: absolute;
+            top: 20px;
+            right: 120px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .game-area {
+                padding: 15px;
+            }
+            
+            .question-counter {
+                right: 100px;
+                padding: 8px 12px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ТЕСТ</h1>
+        </header>
+        
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        
+        <div class="score" id="score">Ұпай: 0</div>
+        <div class="question-counter" id="questionCounter">1/10</div>
+        <div class="timer" id="timer">00:10</div>
+        
+        <div class="game-area">
+            <!-- 10 тест сұрақтары -->
+            <div class="level" id="level1">
+                <div class="question">
+                    <h3>1. Қыз Жібек жырындағы Төлегеннің бейнесін қандай сөздермен сипаттауға болады?</h3>
+                </div>
+                <div class="options">
+                    <div class="option" onclick="checkAnswer(1, 0)">А) Жігерлі, батыл, махаббатқа адал</div>
+                    <div class="option" onclick="checkAnswer(1, 1)">Б) Қу, есекқыр, өтірікші</div>
+                    <div class="option" onclick="checkAnswer(1, 2)">В) Қорқақ, әлсіз, шешімсіз</div>
+                    <div class="option" onclick="checkAnswer(1, 3)">Г) Зиялы, оқымысты, ақылды</div>
+                </div>
+            </div>
+            
+            <div class="level" id="level2">
+                <div class="question">
+                    <h3>2. «Абай жолы» романындағы Құнанбай мен Абайдың көзқарастарын тарихи-көркемдік тұрғыда салыстырыңыз:</h3>
+                </div>
+                <div class="options">
+                    <div class="option" onclick="checkAnswer(2, 0)">А) Құнанбай - дәстүршіл, билікқұмар; Абай - жаңашыл, прогрессивті</div>
+                    <div class="option" onclick="checkAnswer(2, 1)">Б) Екеуі де халықтың әдет-ғұрпын қолдайды</div>
+                    <div class="option" onclick="checkAnswer(2, 2)">В) Екеуі де орыс мәдениетіне қарсы</div>
+                    <div class="option" onclick="checkAnswer(2, 3)">Г) Абай - діни құндылықтарды, Құнанбай - ғылымды қолдайды</div>
+                </div>
+            </div>
+            
+            <div class="level" id="level3">
+                <div class="question">
+                    <h3>3. "Қозы Көрпеш - Баян сұлу" жырындағы Баянның қыз бен әйел ретіндегі бейнесі қандай?</h3>
+                </div>
+                <div class="options">
+                    <div class="option" onclick="checkAnswer(3, 0)">А) Өз ойы бар, еркін тұлға</div>
+                    <div class="option" onclick="checkAnswer(3, 1)">Б) Тығырыққа түскен құрбан</div>
+                    <div class="option" onclick="checkAnswer(3, 2)">В) Қарапайым, тұрмысқа бейім әйел</div>
+                    <div class="option" onclick="checkAnswer(3, 3)">Г) Ақылды, шешен қыз</div>
+                </div>
+            </div>
+            
+            <div class="level" id="level4">
+                <div class="question">
+                    <h3>4. Мұхтар Әуезовтің "Абай жолы" романындағы Абайдың анасы Ұлжанның бейнесі қандай?</h3>
+                </div>
+                <div class="options">
+                    <div class="option" onclick="checkAnswer(4, 0)">А) Қатал, билікқұмар</div>
+                    <div class="option" onclick="checkAnswer(4, 1)">Б) Жұмсақ, мейірімді</div>
+                    <div class="option" onclick="checkAnswer(4, 2)">В) Ақылды, білімді</div>
+                    <div class="option" onclick="checkAnswer(4, 3)">Г) Өмірдегі қиындықтарға шыдамды</div>
+                </div>
+            </div>
+            
+            <div class="level" id="level5">
+                <div class="question">
+                    <h3>5. "Еңлік - Кебек" жырындағы негізгі қайшылық қандай?</h3>
+                </div>
+                <div class="options">
+                    <div class="option" onclick="checkAnswer(5, 0)">А) Жеке махаббат пен рулық қатынастар</div>
+                    <div class="option" onclick="checkAnswer(5, 1)">Б) Байлар мен кедейлер арасындағы қайшылық</div>
+                    <div class="option" onclick="checkAnswer(5, 2)">В) Ұрпақтар арасындағы қайшылық</div>
+                    <div class="option" onclick="checkAnswer(5, 3)">Г) Діни көзқарастар арасындағы қайшылық</div>
+                </div>
+            </div>
+            
+            <div class="level" id="level6">
+                <div class="question">
+                    <h3>6. "Қыз Жібек" жырындағы Жібектің бейнесіндегі негізгі қасиет қандай?</h3>
+                </div>
+                <div class="options">
+                    <div class="option" onclick="checkAnswer(6, 0)">А) Өз қалауын білдіретін күшті қыз</div>
+                    <div class="option" onclick="checkAnswer(6, 1)">Б) Тағдырға бой ұсынған құрбан</div>
+                    <div class="option" onclick="checkAnswer(6, 2)">В) Ақылды және шешен</div>
+                    <div class="option" onclick="checkAnswer(6, 3)">Г) Қуық және есекқыр</div>
+                </div>
+            </div>
+            
+            <div class="level" id="level7">
+                <div class="question">
+                    <h3>7. "Махаббат жыры" деп қандай шығармаларды айтады?</h3>
+                </div>
+                <div class="options">
+                    <div class="option" onclick="checkAnswer(7, 0)">А) Қыз Жібек, Қозы Көрпеш - Баян сұлу, Еңлік - Кебек</div>
+                    <div class="option" onclick="checkAnswer(7, 1)">Б) Абай жолы, Қарағанды</div>
+                    <div class="option" onclick="checkAnswer(7, 2)">В) Алпамыс батыр, Қобыланды батыр</div>
+                    <div class="option" onclick="checkAnswer(7, 3)">Г) Біржан мен Сара, Ахан сері</div>
+                </div>
+            </div>
+            
+            <div class="level" id="level8">
+                <div class="question">
+                    <h3>8. Қазақ әдебиетіндегі "Қоңыр қыз" бейнесі қандай мағынада қолданылады?</h3>
+                </div>
+                <div class="options">
+                    <div class="option" onclick="checkAnswer(8, 0)">А) Өз ойын айта алмайтын, бағынышты қыз</div>
+                    <div class="option" onclick="checkAnswer(8, 1)">Б) Қарапайым, табиғи сұлулық</div>
+                    <div class="option" onclick="checkAnswer(8, 2)">В) Ақылды және шешен қыз</div>
+                    <div class="option" onclick="checkAnswer(8, 3)">Г) Қуық және есекқыр қыз</div>
+                </div>
+            </div>
+            
+            <div class="level" id="level9">
+                <div class="question">
+                    <h3>9. "Абай жолы" романындағы Абайдың өмірлік позициясы қандай?</h3>
+                </div>
+                <div class="options">
+                    <div class="option" onclick="checkAnswer(9, 0)">А) Халықты ояту, жаңашылдық</div>
+                    <div class="option" onclick="checkAnswer(9, 1)">Б) Дәстүрлі құндылықтарды қорғау</div>
+                    <div class="option" onclick="checkAnswer(9, 2)">В) Саяси билікке ұмтылу</div>
+                    <div class="option" onclick="checkAnswer(9, 3)">Г) Діни тұрмысты қолдау</div>
+                </div>
+            </div>
+            
+            <div class="level" id="level10">
+                <div class="question">
+                    <h3>10. Қазақ халқының батырлық жырындағы негізгі идея қандай?</h3>
+                </div>
+                <div class="options">
+                    <div class="option" onclick="checkAnswer(10, 0)">А) Ерлік, халықты қорғау</div>
+                    <div class="option" onclick="checkAnswer(10, 1)">Б) Махаббат пен адалдық</div>
+                    <div class="option" onclick="checkAnswer(10, 2)">В) Табиғат пен адамның үндестігі</div>
+                    <div class="option" onclick="checkAnswer(10, 3)">Г) Діни құндылықтар</div>
+                </div>
+            </div>
+            
+            <!-- Қорытынды экран -->
+            <div class="result-screen" id="resultScreen">
+                <div class="result-title" id="resultTitle">Құттықтаймыз!</div>
+                <div class="final-score" id="finalScore">Сіз 75 ұпай жинадыңыз</div>
+                <div id="rank"></div>
+                <button class="share-btn" onclick="shareResult()">Нәтижені бөлісу</button>
+                <button class="restart-btn" onclick="restartGame()">Қайта ойнау</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Жасырын аудио элементі -->
+    <audio id="backgroundMusic" loop>
+        <source src="ЕРКЕСЫЛҚЫМ.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Ойын айнымалылары
+        let currentLevel = 1;
+        let score = 0;
+        let timeLeft = 10; // Әр сұраққа 10 секунд
+        let timer;
+        const totalLevels = 10;
+        const correctAnswers = [0, 0, 0, 2, 0, 0, 0, 1, 0, 0]; // Әр деңгейдегі дұрыс жауаптардың индекстері
+        const levelPoints = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]; // Әр деңгейдегі максималды ұпай
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        
+        // Ойынды бастау
+        function startGame() {
+            document.getElementById('level1').classList.add('active');
+            startTimer();
+            updateScore();
+            updateQuestionCounter();
+            updateProgressBar();
+            
+            // Музыканы бастау
+            backgroundMusic.play().catch(e => console.log("Аудионы автоматты түрде ойнатуға болмады:", e));
+            backgroundMusic.volume = 0.1;
+        }
+        
+        // Таймерді бастау
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 10; // Әр сұраққа 10 секунд
+            updateTimerDisplay();
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    if (currentLevel < totalLevels) {
+                        nextLevel();
+                    } else {
+                        finishGame();
+                    }
+                }
+            }, 1000);
+        }
+        
+        // Таймерді жаңарту
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // Ұпайды жаңарту
+        function updateScore() {
+            document.getElementById('score').textContent = `Ұпай: ${score}`;
+        }
+        
+        // Прогресс барын жаңарту
+        function updateProgressBar() {
+            const progress = (currentLevel - 1) / totalLevels * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+        
+        // Сұрақ санағышын жаңарту
+        function updateQuestionCounter() {
+            document.getElementById('questionCounter').textContent = `${currentLevel}/${totalLevels}`;
+        }
+        
+        // Жауапты тексеру
+        function checkAnswer(level, answerIndex) {
+            if (level !== currentLevel) return;
+            
+            if (answerIndex === correctAnswers[level - 1]) {
+                score += 1; // Әр дұрыс жауап үшін 1 ұпай
+                alert(`Дұрыс! Сіз 1 ұпай жинадыңыз!`);
+            } else {
+                alert(`Қате! Дұрыс жауап: ${String.fromCharCode(65 + correctAnswers[level - 1])}`);
+            }
+            
+            updateScore();
+            clearInterval(timer);
+            
+            if (currentLevel < totalLevels) {
+                setTimeout(nextLevel, 1500);
+            } else {
+                setTimeout(finishGame, 1500);
+            }
+        }
+        
+        // Келесі деңгейге өту
+        function nextLevel() {
+            document.getElementById(`level${currentLevel}`).classList.remove('active');
+            currentLevel++;
+            document.getElementById(`level${currentLevel}`).classList.add('active');
+            startTimer();
+            updateQuestionCounter();
+            updateProgressBar();
+        }
+        
+        // Ойынды аяқтау
+        function finishGame() {
+            document.getElementById(`level${currentLevel}`).classList.remove('active');
+            backgroundMusic.pause();
+            
+            const resultScreen = document.getElementById('resultScreen');
+            const finalScoreElement = document.getElementById('finalScore');
+            const resultTitle = document.getElementById('resultTitle');
+            const rankElement = document.getElementById('rank');
+            
+            finalScoreElement.textContent = `Сіз ${score} ұпай жинадыңыз`;
+            
+            // Атақты анықтау
+            let rank = '';
+            if (score >= 90) {
+                rank = 'Сіз "Әдебиет сыншысы" атағына ие болдыңыз!';
+                resultTitle.textContent = 'Керемет!';
+            } else if (score >= 70) {
+                rank = 'Сіз "Әдебиет зерттеушісі" атағына ие болдыңыз!';
+                resultTitle.textContent = 'Жақсы!';
+            } else if (score >= 50) {
+                rank = 'Сіз "Әдеби оқырман" атағына ие болдыңыз!';
+                resultTitle.textContent = 'Жарайсыз!';
+            } else {
+                rank = 'Сіз "Әдебиет әуесқойы" атағына ие болдыңыз!';
+                resultTitle.textContent = 'Тағы да көп оқыңыз!';
+            }
+            
+            rankElement.innerHTML = `<h3>${rank}</h3>`;
+            resultScreen.style.display = 'block';
+        }
+        
+        // Нәтижені бөлісу
+        function shareResult() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Әдебиет лабиринті',
+                    text: `Мен Әдебиет лабиринті ойынында ${score} ұпай жинадым! Сен де сынап көр!`,
+                    url: window.location.href
+                }).catch(err => {
+                    console.log('Бөлісу қатесі:', err);
+                });
+            } else {
+                alert('Бөлісу қолдауы жоқ. Нәтижені қолмен көшіріп алуға болады.');
+            }
+        }
+        
+        // Ойынды қайта бастау
+        function restartGame() {
+            currentLevel = 1;
+            score = 0;
+            document.getElementById('resultScreen').style.display = 'none';
+            
+            for (let i = 1; i <= totalLevels; i++) {
+                document.getElementById(`level${i}`).classList.remove('active');
+            }
+            
+            startGame();
+        }
+        
+        // Документ жүктегенде ойынды бастау
+        window.onload = startGame;
+        
+        // Пайдаланушы интеракциясы кезінде аудионы бастау (браузердік шектеулер үшін)
+        document.addEventListener('click', function() {
+            backgroundMusic.play().catch(e => console.log("Аудионы ойнатуға болмады:", e));
+        }, { once: true });
+    </script>
+</body>
+</html>
